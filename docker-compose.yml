@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    container_name: cryptmessenger
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server/prisma:/app/server/prisma
+      - ./server/uploads:/app/server/uploads
+    environment:
+      - JWT_SECRET=super-secret-key-123
+      - PORT=3000
+    restart: always

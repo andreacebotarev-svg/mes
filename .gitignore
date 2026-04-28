@@ -1,0 +1,9 @@
+node_modules/
+pb_data/
+*.db
+*.log
+.DS_Store
+dist/
+uploads/
+pocketbase.exe
+.env

@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  handle       String   @unique
+  displayName  String?
+  bio          String?    // User biography
+  passwordHash String
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  members     Member[]
+  messages    Message[]
+  reactions   Reaction[]
+  readCursors ReadCursor[]
+  keyBundle   KeyBundle?
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  type      String   @default("direct") // "direct" | "group"
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members     Member[]
+  messages    Message[]
+  readCursors ReadCursor[]
+}
+
+model Member {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  role           String       @default("member") // "member" | "admin" | "owner"
+  joinedAt       DateTime     @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  senderId       String
+  type           String   @default("text") // "text" | "image"
+  body           String   // Encrypted ciphertext or image URL
+  nonce          String?  // Encryption nonce (base64)
+  replyToId      String?
+  createdAt      DateTime @default(now())
+  editedAt       DateTime?
+  deletedAt      DateTime?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+
+  reactions Reaction[]
+}
+
+model Reaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+}
+
+model ReadCursor {
+  id               String   @id @default(cuid())
+  conversationId   String
+  userId           String
+  lastReadMessageId String?
+  updatedAt        DateTime @updatedAt
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+}
+
+model KeyBundle {
+  id              String @id @default(cuid())
+  userId          String @unique
+  identityKey     String // Public identity key (base64)
+  signedPreKey    String // Signed pre-key (base64)
+  signedPreKeySig String // Signature of signed pre-key
+  oneTimeKeys     String @default("[]") // JSON array of one-time pre-keys
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

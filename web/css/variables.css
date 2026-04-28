@@ -1,0 +1,118 @@
+/* ===== CryptMessenger Design Tokens ===== */
+:root {
+  /* Telegram-inspired dark palette */
+  --bg-primary: #17212b;
+  --bg-secondary: #0e1621;
+  --bg-tertiary: #1e2c3a;
+  --bg-hover: #202d3b;
+  --bg-active: #2b5278;
+
+  /* Surfaces */
+  --surface-chat: #0e1621;
+  --surface-bubble-out: #2b5278;
+  --surface-bubble-in: #182533;
+  --surface-input: #242f3d;
+  --surface-modal: #1e2c3a;
+
+  /* Text */
+  --text-primary: #f5f5f5;
+  --text-secondary: #8b9bab;
+  --text-tertiary: #5d6e7e;
+  --text-link: #6ab2f2;
+  --text-on-accent: #ffffff;
+
+  /* Accent — electric violet-blue gradient feel */
+  --accent: #6c5ce7;
+  --accent-hover: #7c6ff0;
+  --accent-light: rgba(108, 92, 231, 0.15);
+  --accent-gradient: linear-gradient(135deg, #6c5ce7 0%, #3b82f6 100%);
+
+  /* Status colors */
+  --online: #4caf50;
+  --warning: #ff9800;
+  --danger: #ef5350;
+  --success: #4caf50;
+
+  /* Typography */
+  --font-family:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-size-xs: 0.6875rem; /* 11px */
+  --font-size-sm: 0.8125rem; /* 13px */
+  --font-size-md: 0.875rem; /* 14px */
+  --font-size-lg: 1rem; /* 16px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.75rem; /* 28px */
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  /* Layout */
+  --sidebar-width: 360px;
+  --header-height: 56px;
+  --input-height: 56px;
+  --avatar-size: 42px;
+  --avatar-size-sm: 32px;
+  --avatar-size-lg: 54px;
+
+  /* Borders */
+  --border-color: rgba(255, 255, 255, 0.06);
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-pill: 24px;
+  --border-radius-circle: 50%;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(108, 92, 231, 0.3);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index layers */
+  --z-sidebar: 10;
+  --z-header: 20;
+  --z-modal: 100;
+  --z-context: 110;
+  --z-toast: 120;
+}
+
+/* Light Mode Overrides */
+body.light-mode {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f0f2f5; /* Telegram Web K light bg */
+  --bg-tertiary: #dfe1e5;
+  --bg-hover: #f5f5f5;
+  --bg-active: #e3f2fd; /* Light blue selection */
+
+  --surface-chat: #8e8e93; /* Chat background - usually an image in TG, let's use a soft gray or pattern color */
+  --surface-chat: #e6ebee; /* Standard TG background color */
+  --surface-bubble-out: #eeffde; /* TG light green */
+  --surface-bubble-in: #ffffff;
+  --surface-input: #ffffff;
+  --surface-modal: #ffffff;
+
+  --text-primary: #000000;
+  --text-secondary: #707579;
+  --text-tertiary: #8d9399;
+  --text-link: #3390ec;
+  --text-on-accent: #ffffff;
+
+  --border-color: #dfe1e5;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.1);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+  --shadow-glow: 0 0 15px rgba(51, 144, 236, 0.4);
+
+  --accent: #3390ec;
+  --accent-gradient: linear-gradient(135deg, #3390ec 0%, #007aff 100%);
+}

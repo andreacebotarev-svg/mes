@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+server/prisma/dev.db
+server/prisma/dev.db-journal
+server/uploads/*
+!server/uploads/.gitkeep
+.env
+.git
+.gitignore
+README.md

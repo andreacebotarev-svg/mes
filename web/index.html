@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CryptMessenger — Encrypted Chat</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdn.socket.io https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' blob: data:; connect-src 'self' http://127.0.0.1:8090 ws://127.0.0.1:8090; frame-ancestors 'none';">
+  <meta name="description" content="Open-source encrypted text messenger with E2E encryption">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6c5ce7">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3662/3662817.png">
+</head>
+<body>
+
+  <!-- ===== Auth Screen ===== -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-card glass">
+      <div class="auth-header">
+        <div class="logo">🛡️</div>
+        <h1>CryptMessenger</h1>
+        <p>Zero-Knowledge Communication</p>
+      </div>
+      
+      <div id="auth-forms">
+        <div id="login-form" class="auth-form">
+          <input type="text" id="login-handle" placeholder="Username" autocomplete="username">
+          <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+          <button id="login-btn" class="btn-primary">Login</button>
+          <p class="auth-switch">Don't have an account? <a href="#" id="show-register">Register</a></p>
+        </div>
+        
+        <div id="register-form" class="auth-form hidden">
+          <input type="text" id="reg-handle" placeholder="Username">
+          <input type="text" id="reg-display-name" placeholder="Display Name">
+          <input type="password" id="reg-password" placeholder="Password">
+          <input type="text" id="reg-invite" placeholder="Invite Code (Required)">
+          <button id="register-btn" class="btn-primary">Create Account</button>
+          <p class="auth-switch">Already have an account? <a href="#" id="show-login">Login</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Main Chat Screen ===== -->
+  <div id="chat-screen" class="screen">
+    <div class="app-container">
+      
+      <!-- Sidebar (Conversations) -->
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+          <button id="menu-btn" class="icon-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search chats...">
+          </div>
+        </div>
+        
+        <div id="conversations-list" class="conversations-list">
+          <!-- Conversations injected here -->
+        </div>
+        
+        <button id="new-chat-btn" class="fab">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </aside>
+
+      <!-- Chat Area -->
+      <main id="chat-area" class="chat-area no-selection">
+        <div class="no-chat-selected">
+          <div class="logo-faded">🛡️</div>
+          <p>Select a chat to start messaging</p>
+        </div>
+
+        <div id="active-chat" class="active-chat hidden">
+          <div class="chat-header">
+            <div class="chat-info">
+              <button id="back-btn" class="icon-btn mobile-only">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              </button>
+              <div id="chat-avatar" class="avatar">U</div>
+              <div>
+                <h3 id="chat-title">Username</h3>
+                <div class="chat-subtitle">
+                  <span id="chat-status" class="chat-status">offline</span>
+                  <span id="chat-fingerprint" class="chat-fingerprint" title="Security Code"></span>
+                </div>
+              </div>
+            </div>
+            <div class="chat-header-actions">
+              <button id="call-audio-btn" class="icon-btn">📞</button>
+              <button id="call-video-btn" class="icon-btn">📹</button>
+              <button id="chat-menu-btn" class="icon-btn" title="More">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+              <div id="chat-dropdown" class="dropdown-menu hidden">
+                <button id="rotate-keys-btn" class="dropdown-item">
+                  <span class="icon">🔄</span> Rotate Security Keys
+                </button>
+                <button id="clear-history-btn" class="dropdown-item btn-danger">
+                  <span class="icon">🗑️</span> Clear History
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="messages-container" class="messages-container">
+            <div id="messages-list"></div>
+            <div id="typing-indicator" class="typing-indicator hidden">
+              <span id="typing-user">Someone</span> is typing...
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <div id="reply-preview" class="reply-preview hidden">
+              <div class="reply-content">
+                <span class="reply-author">Author</span>
+                <p class="reply-text">Message preview...</p>
+              </div>
+              <button id="cancel-reply" class="icon-btn">✕</button>
+            </div>
+            <div class="input-wrapper">
+              <button id="attach-btn" class="icon-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              </button>
+              <textarea id="message-input" placeholder="Write a message..." rows="1"></textarea>
+              <button id="emoji-toggle-btn" class="icon-btn">😊</button>
+              <button id="send-btn" class="icon-btn primary">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polyline points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+          
+          <div id="emoji-picker" class="emoji-picker hidden"></div>
+        </div>
+      </main>
+
+      <!-- Bottom Navigation (Mobile) -->
+      <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="chats">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Chats</span>
+        </button>
+        <button class="nav-item" data-tab="people">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>People</span>
+        </button>
+        <button class="nav-item" data-tab="settings">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Side Drawer -->
+    <div id="side-drawer" class="drawer-overlay hidden">
+      <div class="drawer glass">
+        <div class="drawer-header">
+          <div class="user-profile">
+            <div id="my-avatar" class="avatar avatar-lg">M</div>
+            <div class="user-details">
+              <h4 id="my-name">My Name</h4>
+              <p id="my-handle">@handle</p>
+            </div>
+          </div>
+        </div>
+        <div class="drawer-menu">
+          <div class="settings-section">
+            <h4>Security & Privacy</h4>
+            <p class="settings-hint">Data older than 90 days is automatically purged from the server for your privacy.</p>
+            <button id="export-keys-btn" class="drawer-item"><span class="drawer-icon">🛡️</span> Backup Encryption Keys</button>
+            <button id="clear-vault-btn" class="drawer-item btn-danger"><span class="drawer-icon">🗑️</span> Clear Local Vault</button>
+          </div>
+          <div class="drawer-divider"></div>
+          <button class="drawer-item" data-action="night-mode">
+            <span class="drawer-icon">🌙</span> Night Mode
+            <div class="toggle-switch"><input type="checkbox" id="theme-toggle"><span class="slider"></span></div>
+          </button>
+          <button class="drawer-item" id="logout-btn"><span class="drawer-icon">🚪</span> Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Call Overlay ===== -->
+  <div id="call-overlay" class="call-overlay hidden">
+    <div id="call-bg-blur" class="call-bg-blur"></div>
+    <div class="call-container">
+      <div class="video-grid">
+        <video id="remote-video" autoplay playsinline></video>
+        <video id="local-video" class="mini-video" autoplay playsinline muted></video>
+      </div>
+      
+      <div class="call-info">
+        <div id="call-avatar" class="avatar avatar-xl">U</div>
+        <h2 id="call-user-name">Username</h2>
+        <span id="call-status-text">Calling...</span>
+      </div>
+
+      <div id="call-controls" class="call-controls hidden">
+        <button id="toggle-mic-btn" class="call-btn">🎙️</button>
+        <button id="toggle-video-btn" class="call-btn">📹</button>
+        <button id="pip-btn" class="call-btn">📺</button>
+        <button id="hangup-btn" class="call-btn btn-danger">📞</button>
+      </div>
+
+      <div id="incoming-call-actions" class="incoming-actions hidden">
+        <button id="answer-audio-btn" class="call-btn btn-success">📞 Answer</button>
+        <button id="answer-video-btn" class="call-btn btn-primary">📹 Video</button>
+        <button id="reject-btn" class="call-btn btn-danger">✖ Reject</button>
+        <button id="quick-reply-btn" class="call-btn btn-outline">💬 Reply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Reply Drawer -->
+  <div id="quick-reply-drawer" class="drawer-overlay hidden">
+    <div class="bottom-sheet glass">
+      <h3>Quick Reply</h3>
+      <div class="reply-options">
+        <button class="reply-opt">I'll call you back in 5 mins</button>
+        <button class="reply-opt">Can't talk now, text me</button>
+        <button class="reply-opt">In a meeting</button>
+        <button class="reply-opt">Sleeping</button>
+      </div>
+      <div class="custom-reply">
+        <input type="text" id="custom-reply-input" placeholder="Type custom message...">
+        <button id="send-custom-reply" class="btn-primary">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Hidden Image Input -->
+  <input type="file" id="image-file-input" class="hidden" accept="image/*">
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/gh/pocketbase/js-sdk@master/dist/pocketbase.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/libsodium-wrappers@0.7.15/dist/modules/libsodium-wrappers.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/crypto-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/messages.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/calls.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

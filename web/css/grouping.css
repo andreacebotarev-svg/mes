@@ -1,0 +1,63 @@
+/* Message Grouping */
+.message-wrapper.group-start .message {
+  border-bottom-left-radius: 4px; /* Default for incoming */
+}
+.message-wrapper.outgoing.group-start .message {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 4px;
+}
+
+.message-wrapper.group-middle .message {
+  border-radius: 4px 12px 12px 4px; /* Incoming middle */
+}
+.message-wrapper.outgoing.group-middle .message {
+  border-radius: 12px 4px 4px 12px; /* Outgoing middle */
+}
+
+.message-wrapper.group-end .message {
+  border-top-left-radius: 4px; /* Incoming end */
+  border-bottom-left-radius: 12px;
+}
+.message-wrapper.outgoing.group-end .message {
+  border-top-right-radius: 4px; /* Outgoing end */
+  border-bottom-right-radius: 12px;
+}
+
+/* Adjust margins for grouped messages */
+.message-wrapper.group-middle,
+.message-wrapper.group-end {
+  margin-top: -4px;
+}
+
+/* Ticks */
+.message-status-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  color: rgba(255,255,255,0.7);
+}
+
+.message-status-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.message-status-icon .tick-2 {
+  display: none;
+}
+
+.message-status-icon.read .tick-2 {
+  display: block;
+}
+
+.message-status-icon.read {
+  color: #4ade80; /* Green for read */
+}
+
+/* Fix reaction spacing with grouping */
+.message-wrapper.group-start .message-reactions,
+.message-wrapper.group-middle .message-reactions {
+  width: 100%;
+  justify-content: flex-end; /* Or hide reactions for middle? No, keep them */
+  z-index: 5;
+}

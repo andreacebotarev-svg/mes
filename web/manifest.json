@@ -1,0 +1,17 @@
+{
+  "name": "CryptMessenger",
+  "short_name": "Crypt",
+  "description": "End-to-end encrypted messaging with voice & video calls",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0d12",
+  "theme_color": "#6c5ce7",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3662/3662817.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
