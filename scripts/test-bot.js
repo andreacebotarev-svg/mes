@@ -8,7 +8,7 @@ async function startBot() {
         // 1. Login as Bot
         await pb.collection('users').authWithPassword('testbot', 'password123');
         const botId = pb.authStore.model.id;
-        console.log(`✅ Bot logged in as ${pb.authStore.model.username} (ID: ${botId})`);
+        console.log('✅ Bot logged in successfully');
 
         // 2. Subscribe to new messages
         pb.collection('messages').subscribe('*', async (e) => {

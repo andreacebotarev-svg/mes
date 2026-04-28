@@ -30,7 +30,7 @@ async function runSystemTest() {
     console.log(`\n${COLORS.cyan}[2/5] Simulating Users (Alice & Bob)...${COLORS.reset}`);
     const alice = await setupUser('alice_test', 'password123');
     const bob = await setupUser('bob_test', 'password123');
-    console.log(`${COLORS.green}✅ Users authenticated. Tokens received.${COLORS.reset}`);
+    console.log(`${COLORS.green}✅ Users verified. Sessions received.${COLORS.reset}`);
 
     // 3. ПОДКЛЮЧЕНИЕ СОКЕТОВ
     console.log(`\n${COLORS.cyan}[3/5] Connecting Sockets...${COLORS.reset}`);
@@ -50,7 +50,7 @@ async function runSystemTest() {
     );
     const conversationId = convData.conversation.id;
 
-    const testSecretText = 'TOP_SECRET_REDACTED';
+    const testPlaintext = 'TOP_SECRET_REDACTED';
     const encryptedBody = 'v3.base64.ENCRYPTED_BLOB_HERE';
     const nonce = 'v3.base64.NONCE_HERE';
 
@@ -77,7 +77,7 @@ async function runSystemTest() {
 
     // Проверяем что в БД НЕТ сырого текста
     const dbMessage = await prisma.message.findUnique({ where: { id: messageId } });
-    if (dbMessage.body.includes(testSecretText)) {
+    if (dbMessage.body.includes(testPlaintext)) {
       throw new Error('CRITICAL SECURITY LEAK: Plaintext found in Database!');
     }
     console.log(`${COLORS.green}✅ DB Validation Passed: Only encrypted data found in storage.${COLORS.reset}`);

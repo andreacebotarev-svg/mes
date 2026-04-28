@@ -23,7 +23,7 @@ async function initTestData() {
             handle: 'testbot'
         }).catch(e => console.log('Bot already exists'));
 
-        console.log('✅ Test users created. Login with: user1 / password123');
+        console.log('✅ Test users created. Use default test credentials.');
         
         // 3. Create a conversation between them
         // In PocketBase, we'd typically create a 'conversations' record

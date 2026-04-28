@@ -29,8 +29,10 @@ export default async function uploadRoutes(fastify) {
     }
 
     // Generate unique filename
+    const crypto = await import('crypto');
     const ext = path.extname(data.filename) || '.jpg';
-    const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}${ext}`;
+    const randomSuffix = crypto.randomBytes(4).toString('hex');
+    const fileName = `${Date.now()}_${randomSuffix}${ext}`;
     const filePath = path.join(UPLOADS_DIR, fileName);
 
     // Save file
